@@ -1,48 +1,105 @@
 using System;
+using System.Collections;
 using StarterAssets;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class WeaponController : MonoBehaviour
 {
+    [Header("Weapon Features")]
     private int _rayMaxDistance;
-    private StarterAssetsInputs _starterAssetsInputs;
+    private Weapon _selectedWeapon;
+    private bool _delayControl = true;
 
+    [Header("Weapon Scriptable Objects")]
+    //private WeaponSo _selectedWeaponSo;
+    //[SerializeField] private WeaponSo pistolWeaponSo;
+
+    [Header("Animations")]
+    private Animator _selectedAnimator;
+    [SerializeField] Animator pistolAnimator;
+    private string _fireAnimName;
+
+    [Header("Particle Systems")]
+    private ParticleSystem _selectedShootParticle;
+    private ParticleSystem _selectedHitAirParticle;
+    
+    [Header("Pistol")]
+    [SerializeField] private ParticleSystem pistolHitAirParticle;
+    [SerializeField] private ParticleSystem pistolShootParticle;
+    
+
+    [Header("Other Features")]
+    private StarterAssetsInputs _starterAssetsInputs;
     private Camera _mainCamera;
     
     private void Awake()
     {
         _starterAssetsInputs = GetComponentInParent<StarterAssetsInputs>();
         _mainCamera = Camera.main;
+        _selectedWeapon = Weapon.Pistol;
+        SelectGun();
+    }
+
+    private void OnEnable()
+    {
+        GetAnimationState.onAnimationFinished += DelayFire;
+    }
+
+    private void OnDisable()
+    {
+        GetAnimationState.onAnimationFinished -= DelayFire;
     }
 
     void Update()
     {
-        if (_starterAssetsInputs.shoot)
+        if (_starterAssetsInputs.shoot && _delayControl)
         {
-            RaycastHit _hit;
-            if (Physics.Raycast(_mainCamera.transform.position, _mainCamera.transform.forward, out _hit, 100))
+            //_delayControl = false;
+            _selectedShootParticle.Play();
+            _selectedAnimator.Play(_fireAnimName,0, 0);
+            _starterAssetsInputs.ShootInput(false);
+            RaycastHit hit;
+            if (Physics.Raycast(_mainCamera.transform.position, _mainCamera.transform.forward, out hit, Mathf.Infinity))
             {
                 // “Bu objede IDamageable kullanan bir script var mı?”
                 // Eğer EnemyHealth bu interface’i implement ettiyse:
                 // → Evet, var!
                 // Ve onu döndürür.
-                IDamagable _damagable = _hit.collider.GetComponent<IDamagable>();
-                if (_damagable != null)
+                IDamagable damagable = hit.collider.GetComponentInParent<IDamagable>();
+                if (damagable != null)
                 {
-                    if (_hit.transform.gameObject.CompareTag("Enemy"))
+                    if (hit.transform.gameObject.CompareTag("Enemy"))
                     {
-                        _damagable.TakeDamage(25);
-                        Debug.Log(_hit.transform.gameObject.name);
+                        damagable.TakeDamage(25);
                     }
                 }
-                _starterAssetsInputs.ShootInput(false);
-            }
-            else
-            {
-                _starterAssetsInputs.ShootInput(false);
+                else
+                {
+                    ParticleSystem hitAir = Instantiate(_selectedHitAirParticle, hit.point, quaternion.identity);
+                    hitAir.Play();
+                }
+                Debug.Log(damagable);
             }
         }
-        
+    }
+
+    private void DelayFire()
+    {
+        _delayControl = true;
+    }
+
+    private void SelectGun()
+    {
+        switch (_selectedWeapon)
+        {
+            case Weapon.Pistol:
+                _selectedAnimator = pistolAnimator;
+                _selectedShootParticle = pistolShootParticle;
+                _selectedHitAirParticle = pistolHitAirParticle;
+                _fireAnimName = "PistolFire";
+                break;
+        }
     }
 }
