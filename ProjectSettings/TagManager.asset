@@ -6,6 +6,8 @@ TagManager:
   tags:
   - CinemachineTarget
   - Enemy
+  - Pistol
+  - SMG
   layers:
   - Default
   - TransparentFX

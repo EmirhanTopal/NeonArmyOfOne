@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
@@ -13,6 +14,9 @@ namespace StarterAssets
 		public bool jump;
 		public bool sprint;
 		public bool shoot;
+		public bool firstSlot;
+		public bool secondSlot;
+		public Action<int> slotAction;
 
 		[Header("Movement Settings")]
 		public bool analogMovement;
@@ -47,7 +51,21 @@ namespace StarterAssets
 
 		public void OnShoot(InputValue value)
 		{
-			ShootInput(value.isPressed);
+			bool isPressed = value.isPressed;
+			ShootInput(isPressed);
+		}
+
+		public void OnEquipGun(InputValue value)
+		{
+			if (value.isPressed)
+			{
+				// hangi tuş basıldı?
+				var control = Keyboard.current;
+				if (control.digit1Key.wasPressedThisFrame)
+					slotAction?.Invoke(1);
+				else if (control.digit2Key.wasPressedThisFrame)
+					slotAction?.Invoke(2);
+			}
 		}
 #endif
 
