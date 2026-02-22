@@ -1,26 +1,19 @@
 using System;
 using UnityEngine;
 
-public class PickUpGun : MonoBehaviour
+public class PickUpGun : Pickup
 {
+    [SerializeField] private Weapon weapon;
     public static Action<Weapon> AvailableWeaponAction;
     
-    private void OnTriggerEnter(Collider other)
+    private void Update()
     {
-        if (other.gameObject.CompareTag("Pistol"))
-        {
-            AvailableWeaponAction?.Invoke(Weapon.Pistol);
-            Destroy(other.gameObject);
-        }
-        else if (other.gameObject.CompareTag("SMG"))
-        {
-            AvailableWeaponAction?.Invoke(Weapon.Smg);
-            Destroy(other.gameObject);
-        }
-        else if (other.gameObject.CompareTag("Awp"))
-        {
-            AvailableWeaponAction?.Invoke(Weapon.Awp);
-            Destroy(other.gameObject);
-        }
+        transform.Rotate(0f, 100f * Time.deltaTime, 0f);
+    }
+
+    protected override void PickupWeapon()
+    {
+        AvailableWeaponAction?.Invoke(weapon);
+        Destroy(this.gameObject);
     }
 }

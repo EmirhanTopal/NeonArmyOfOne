@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Cinemachine;
 using StarterAssets;
 using Unity.Mathematics;
 using UnityEngine;
@@ -26,13 +27,19 @@ public class WeaponController : MonoBehaviour
     private bool _delayControl = true;
     private List<WeaponSlot> _weaponsSlot = new List<WeaponSlot>();
     private int _scrollSlotChangeValue = -1;
+    [SerializeField] private GameObject defaultAimCanvasImage;
     
     [Header("Other Features")]
     private StarterAssetsInputs _starterAssetsInputs;
+    private FirstPersonController _firstPersonController;
+    private float _defaultRotationSpeed;
     private Camera _mainCamera;
+    [SerializeField] private CinemachineVirtualCamera  playerFollowCamera;
+    private float _mainCameraDefaultZoomField;
 
     [Header("Player Choices")] 
     [SerializeField] private bool canZoomByOneClick;
+    [SerializeField] private LayerMask raycastLayerMask;
     
     [Header("Select")]
     private Weapon _selectedWeapon;
@@ -44,8 +51,11 @@ public class WeaponController : MonoBehaviour
     private bool _isSmgAvailable;
     private bool _isAwpAvailable;
     private bool _selectedGunIsAutomatic = false;
+    private int _selectedZoomField;
     private bool _selectedGunCanZoom;
     private bool _isSelectedGunZooming = false;
+    private float _selectedZoomRotationSpeed;
+    private GameObject _selectedGunZoomCanvasImage;
     private ParticleSystem _selectedShootParticle;
     private ParticleSystem _selectedHitAirParticle;
 
@@ -58,7 +68,9 @@ public class WeaponController : MonoBehaviour
     [SerializeField] private bool pistolIsAutomatic = false;
     [SerializeField] private int pistolDamage;
     [SerializeField] private bool pistolCanZoom;
-
+    [SerializeField] private int pistolZoomField;
+    [SerializeField] private float pistolZoomRotationSpeed;
+    
     [Header("SMG")]
     [SerializeField] private GameObject smg;
     [SerializeField] private Animator smgAnimator;
@@ -68,6 +80,8 @@ public class WeaponController : MonoBehaviour
     [SerializeField] private bool smgIsAutomatic = false;
     [SerializeField] private int smgDamage;
     [SerializeField] private bool smgCanZoom;
+    [SerializeField] private int smgZoomField;
+    [SerializeField] private float smgRotationSpeed;
     
     [Header("Awp")]
     [SerializeField] private GameObject awp;
@@ -78,14 +92,23 @@ public class WeaponController : MonoBehaviour
     [SerializeField] private bool awpIsAutomatic = false;
     [SerializeField] private int awpDamage;
     [SerializeField] private bool awpCanZoom;
-    
+    [SerializeField] private int awpZoomField;
+    [SerializeField] private GameObject awpZoomCanvasImage;
+    [SerializeField] private float awpZoomRotationSpeed;
     
     private void Awake()
     {
         _starterAssetsInputs = GetComponentInParent<StarterAssetsInputs>();
+        _firstPersonController = GetComponentInParent<FirstPersonController>();
         _mainCamera = Camera.main;
         _selectedWeapon = Weapon.Smg;
         _weaponsSlot.Clear();
+    }
+
+    private void Start()
+    {
+        _mainCameraDefaultZoomField = playerFollowCamera.m_Lens.FieldOfView;
+        _defaultRotationSpeed = _firstPersonController.RotationSpeed;
     }
 
     private void OnEnable()
@@ -142,16 +165,6 @@ public class WeaponController : MonoBehaviour
         }
     }
 
-    private void GunZoom()
-    {
-        Debug.Log("Zooming");
-    }
-    
-    private void CloseZoom()
-    {
-        Debug.Log("Close Zoom");
-    }
-
     private void Fire()
     {
         _delayControl = false;
@@ -159,7 +172,7 @@ public class WeaponController : MonoBehaviour
         _selectedShootParticle.Play();
         _selectedAnimator.Play(_selectedWeaponFireAnimName,0, 0);
         RaycastHit hit;
-        if (Physics.Raycast(_mainCamera.transform.position, _mainCamera.transform.forward, out hit, Mathf.Infinity))
+        if (Physics.Raycast(_mainCamera.transform.position, _mainCamera.transform.forward, out hit,Mathf.Infinity, raycastLayerMask, QueryTriggerInteraction.Ignore)) // ctrl + shift + space constructor ları görüntüler
         {
             // “Bu objede IDamageable kullanan bir script var mı?”
             // Eğer EnemyHealth bu interface’i implement ettiyse:
@@ -261,7 +274,13 @@ public class WeaponController : MonoBehaviour
                 _selectedGunIsAutomatic = pistolIsAutomatic;
                 _selectedGunDamage = pistolDamage;
                 _selectedGunCanZoom = pistolCanZoom;
+                _selectedZoomField = pistolZoomField;
+                _selectedGunZoomCanvasImage = null;
+
+                pistolZoomRotationSpeed = _defaultRotationSpeed;
+                _selectedZoomRotationSpeed = pistolZoomRotationSpeed;
                 break;
+            
             case Weapon.Smg:
                 _selectedAnimator = smgAnimator;
                 _selectedShootParticle = smgShootParticle;
@@ -271,7 +290,12 @@ public class WeaponController : MonoBehaviour
                 _selectedGunIsAutomatic = smgIsAutomatic;
                 _selectedGunDamage = smgDamage;
                 _selectedGunCanZoom = smgCanZoom;
+                _selectedZoomField = smgZoomField;
+                
+                pistolZoomRotationSpeed = _defaultRotationSpeed;
+                _selectedGunZoomCanvasImage = null;
                 break;
+            
             case Weapon.Awp:
                 _selectedAnimator = awpAnimator;
                 _selectedShootParticle = awpShootParticle;
@@ -281,7 +305,32 @@ public class WeaponController : MonoBehaviour
                 _selectedGunIsAutomatic = awpIsAutomatic;
                 _selectedGunDamage = awpDamage;
                 _selectedGunCanZoom = awpCanZoom;
+                _selectedZoomField = awpZoomField;
+                _selectedGunZoomCanvasImage = awpZoomCanvasImage;
+                _selectedZoomRotationSpeed = awpZoomRotationSpeed;
                 break;
         }
+    }
+    
+    private void GunZoom()
+    {
+        if (_selectedGunZoomCanvasImage != null)
+        {
+            _selectedGunZoomCanvasImage.SetActive(true);
+            defaultAimCanvasImage.SetActive(false);
+        }
+        playerFollowCamera.m_Lens.FieldOfView = _selectedZoomField;
+        _firstPersonController.ChangeRotationSpeed(_selectedZoomRotationSpeed);
+    }
+    
+    private void CloseZoom()
+    {
+        if (_selectedGunZoomCanvasImage != null)
+        {
+            _selectedGunZoomCanvasImage.SetActive(false);
+            defaultAimCanvasImage.SetActive(true);
+        }
+        _firstPersonController.ChangeRotationSpeed(_defaultRotationSpeed);
+        playerFollowCamera.m_Lens.FieldOfView = _mainCameraDefaultZoomField;
     }
 }
