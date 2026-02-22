@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Cinemachine;
 using StarterAssets;
+using TMPro;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -18,6 +19,7 @@ public enum Weapon
     Pistol,
     Smg,
     Awp,
+    Empty
 }
 
 public class WeaponController : MonoBehaviour
@@ -26,8 +28,13 @@ public class WeaponController : MonoBehaviour
     private int _rayMaxDistance;
     private bool _delayControl = true;
     private List<WeaponSlot> _weaponsSlot = new List<WeaponSlot>();
-    private int _scrollSlotChangeValue = -1;
+    private int _scrollSlotChangeValue = 0;
+    private int _currentSlotIndex = 2;
+    
+    [Header("Canvas Related Weapons")]
     [SerializeField] private GameObject defaultAimCanvasImage;
+    [SerializeField] private TextMeshProUGUI ammoText;
+    [SerializeField] private TextMeshProUGUI ammoStockText;
     
     [Header("Other Features")]
     private StarterAssetsInputs _starterAssetsInputs;
@@ -58,6 +65,17 @@ public class WeaponController : MonoBehaviour
     private GameObject _selectedGunZoomCanvasImage;
     private ParticleSystem _selectedShootParticle;
     private ParticleSystem _selectedHitAirParticle;
+    private int _selectedGunAmmo = -1;
+    private int _selectedGunAmmoStock = -1;
+    private int _currentAmmo = -1;
+    private int _currentAmmoStock = -1;
+    public int CurrentAmmo { get => _currentAmmo; set { if (value < 0) _currentAmmo = 0; else _currentAmmo = value; }}
+    public int CurrentAmmoStock { get => _currentAmmoStock; set { if (value < 0) _currentAmmoStock = 0; else _currentAmmoStock = value; } }
+    //private int CurrentAmmo { get { return _currentAmmo; } set { if (value < 0) _currentAmmo = 0; } }
+    //private int CurrentAmmoStock { get { return _currentAmmoStock; } set { if (value < 0) _currentAmmoStock = 0; } }
+    private bool _pistolInitialized;
+    private bool _smgInitialized;
+    private bool _awpInitialized;
 
     [Header("Pistol")]
     [SerializeField] private GameObject pistol;
@@ -70,6 +88,10 @@ public class WeaponController : MonoBehaviour
     [SerializeField] private bool pistolCanZoom;
     [SerializeField] private int pistolZoomField;
     [SerializeField] private float pistolZoomRotationSpeed;
+    [SerializeField] private int pistolAmmo;
+    [SerializeField] private int pistolAmmoStock;
+    private int pistolCurrentAmmo;
+    private int pistolCurrentAmmoStock;
     
     [Header("SMG")]
     [SerializeField] private GameObject smg;
@@ -82,6 +104,10 @@ public class WeaponController : MonoBehaviour
     [SerializeField] private bool smgCanZoom;
     [SerializeField] private int smgZoomField;
     [SerializeField] private float smgRotationSpeed;
+    [SerializeField] private int smgAmmo;
+    [SerializeField] private int smgAmmoStock;
+    private int smgCurrentAmmo;
+    private int smgCurrentAmmoStock;
     
     [Header("Awp")]
     [SerializeField] private GameObject awp;
@@ -95,13 +121,17 @@ public class WeaponController : MonoBehaviour
     [SerializeField] private int awpZoomField;
     [SerializeField] private GameObject awpZoomCanvasImage;
     [SerializeField] private float awpZoomRotationSpeed;
+    [SerializeField] private int awpAmmo;
+    [SerializeField] private int awpAmmoStock;
+    private int awpCurrentAmmo;
+    private int awpCurrentAmmoStock;
     
     private void Awake()
     {
         _starterAssetsInputs = GetComponentInParent<StarterAssetsInputs>();
         _firstPersonController = GetComponentInParent<FirstPersonController>();
         _mainCamera = Camera.main;
-        _selectedWeapon = Weapon.Smg;
+        _selectedWeapon = Weapon.Empty;
         _weaponsSlot.Clear();
     }
 
@@ -129,6 +159,8 @@ public class WeaponController : MonoBehaviour
 
     void Update()
     {
+        ammoText.text = CurrentAmmo.ToString();
+        ammoStockText.text = CurrentAmmoStock.ToString();
         if (_isPistolAvailable || _isSmgAvailable || _isAwpAvailable)
         {
             if (_starterAssetsInputs.shoot && _selectedGunIsAutomatic && _delayControl)
@@ -148,18 +180,18 @@ public class WeaponController : MonoBehaviour
                     {
                         _isSelectedGunZooming = !_isSelectedGunZooming;
                         if (_isSelectedGunZooming)
-                            GunZoom();
+                            GunOpenZoom();
                         else
-                            CloseZoom();
+                            GunCloseZoom();
                         _starterAssetsInputs.ZoomInput(false);
                     }
                 }
                 else // hold right click
                 {
                     if (_starterAssetsInputs.zoom)
-                        GunZoom();
+                        GunOpenZoom();
                     else
-                        CloseZoom();
+                        GunCloseZoom();
                 }
             }
         }
@@ -167,6 +199,8 @@ public class WeaponController : MonoBehaviour
 
     private void Fire()
     {
+        if (!AmmoControl())
+            return;
         _delayControl = false;
         StartCoroutine(DelayFireByRate());
         _selectedShootParticle.Play();
@@ -194,6 +228,44 @@ public class WeaponController : MonoBehaviour
         }
     }
 
+    private bool AmmoControl()
+    {
+        if (CurrentAmmoStock > 0)
+        {
+            if (CurrentAmmo > 0)
+            {
+                CurrentAmmo--;
+            }
+            if (CurrentAmmo == 0)
+            {
+                CurrentAmmoStock--;
+                CurrentAmmo = _selectedGunAmmo;
+            }
+        }
+        if (CurrentAmmoStock == 0 && CurrentAmmo == 0)
+            return false;
+        return true;
+    }
+
+    private void SetAmmoReturnToGun()
+    {
+        switch (_selectedWeapon)
+        {
+            case Weapon.Pistol:
+                pistolCurrentAmmo = CurrentAmmo;
+                pistolCurrentAmmoStock = CurrentAmmoStock;
+                break;
+            case Weapon.Smg:
+                smgCurrentAmmo = CurrentAmmo;
+                smgCurrentAmmoStock = CurrentAmmoStock;
+                break;
+            case Weapon.Awp:
+                awpCurrentAmmo = CurrentAmmo;
+                awpCurrentAmmoStock = CurrentAmmoStock;
+                break;
+        }
+    }
+    
     private IEnumerator DelayFireByRate()
     {
         yield return new WaitForSeconds(_selectedFireRate);
@@ -219,10 +291,20 @@ public class WeaponController : MonoBehaviour
                 _weaponsSlot.Add(new WeaponSlot{ weaponGo = awp , weaponType = weaponType});
                 break;
         }
+        foreach (var weapon in _weaponsSlot)
+        {
+            weapon.weaponGo.SetActive(false);
+        }
+        SetAmmoReturnToGun();
+        _weaponsSlot[_weaponsSlot.Count - 1].weaponGo.SetActive(true);
+        _selectedWeapon = _weaponsSlot[_weaponsSlot.Count - 1].weaponType;
+        _scrollSlotChangeValue++;
+        SelectGun();
     }
 
     private void SelectGunByScroll(float scrollValue)
     {
+        // scroll da sorun var - ileri geri yapıldığında bug lı çalışıyor kontrol edilecek.
         if (_weaponsSlot.Count < 1)
             return;
         int scrollNormalized = 0;
@@ -232,17 +314,22 @@ public class WeaponController : MonoBehaviour
         else if (scrollValue < 0)
             scrollNormalized = -1;
         
-        if (_scrollSlotChangeValue + scrollNormalized > _weaponsSlot.Count)
+        if (_scrollSlotChangeValue + scrollNormalized >= _weaponsSlot.Count)
             _scrollSlotChangeValue = _weaponsSlot.Count;
         else if (_scrollSlotChangeValue + scrollNormalized <= 0)
             _scrollSlotChangeValue = 1;
         else
             _scrollSlotChangeValue += scrollNormalized;
+
+        if (_scrollSlotChangeValue == _currentSlotIndex)
+            return;
         
+        _currentSlotIndex = _scrollSlotChangeValue;
         foreach (var weapon in _weaponsSlot)
         {
             weapon.weaponGo.SetActive(false);
         }
+        SetAmmoReturnToGun();
         _weaponsSlot[_scrollSlotChangeValue - 1].weaponGo.SetActive(true);
         _selectedWeapon = _weaponsSlot[_scrollSlotChangeValue - 1].weaponType;
         SelectGun();
@@ -250,12 +337,13 @@ public class WeaponController : MonoBehaviour
     
     private void SelectGunByKeyboard(int slotNumber)
     {
+        if (_weaponsSlot.Count < slotNumber)
+            return;
         foreach (var weapon in _weaponsSlot)
         {
             weapon.weaponGo.SetActive(false);
         }
-        if (_weaponsSlot.Count < slotNumber)
-            return;
+        SetAmmoReturnToGun();
         _weaponsSlot[slotNumber - 1].weaponGo.SetActive(true);
         _selectedWeapon = _weaponsSlot[slotNumber - 1].weaponType;
         SelectGun();
@@ -279,6 +367,20 @@ public class WeaponController : MonoBehaviour
 
                 pistolZoomRotationSpeed = _defaultRotationSpeed;
                 _selectedZoomRotationSpeed = pistolZoomRotationSpeed;
+
+                if (!_pistolInitialized)
+                {
+                    _selectedGunAmmo = pistolAmmo;
+                    _selectedGunAmmoStock = pistolAmmoStock;
+                    pistolCurrentAmmo = pistolAmmo;
+                    pistolCurrentAmmoStock = pistolAmmoStock;
+                    _pistolInitialized = true;
+                }
+                else
+                {
+                    _selectedGunAmmo = pistolCurrentAmmo;
+                    _selectedGunAmmoStock = pistolCurrentAmmoStock;
+                }
                 break;
             
             case Weapon.Smg:
@@ -294,6 +396,20 @@ public class WeaponController : MonoBehaviour
                 
                 pistolZoomRotationSpeed = _defaultRotationSpeed;
                 _selectedGunZoomCanvasImage = null;
+                
+                if (!_smgInitialized)
+                {
+                    _selectedGunAmmo = smgAmmo;
+                    _selectedGunAmmoStock = smgAmmoStock;
+                    smgCurrentAmmo = smgAmmo;
+                    smgCurrentAmmoStock = smgAmmoStock;
+                    _smgInitialized = true;
+                }
+                else
+                {
+                    _selectedGunAmmo = smgCurrentAmmo;
+                    _selectedGunAmmoStock = smgCurrentAmmoStock;
+                }
                 break;
             
             case Weapon.Awp:
@@ -308,11 +424,29 @@ public class WeaponController : MonoBehaviour
                 _selectedZoomField = awpZoomField;
                 _selectedGunZoomCanvasImage = awpZoomCanvasImage;
                 _selectedZoomRotationSpeed = awpZoomRotationSpeed;
+                
+                if (!_awpInitialized)
+                {
+                    _selectedGunAmmo = awpAmmo;
+                    _selectedGunAmmoStock = awpAmmoStock;
+                    awpCurrentAmmo = awpAmmo;
+                    awpCurrentAmmoStock = awpAmmoStock;
+                    _awpInitialized = true;
+                }
+                else
+                {
+                    _selectedGunAmmo = awpCurrentAmmo;
+                    _selectedGunAmmoStock = awpCurrentAmmoStock;
+                }
                 break;
         }
+
+        CurrentAmmo = _selectedGunAmmo;
+        CurrentAmmoStock = _selectedGunAmmoStock;
+        Debug.Log("Ammo: " + CurrentAmmo + " / " + CurrentAmmoStock);
     }
     
-    private void GunZoom()
+    private void GunOpenZoom()
     {
         if (_selectedGunZoomCanvasImage != null)
         {
@@ -323,7 +457,7 @@ public class WeaponController : MonoBehaviour
         _firstPersonController.ChangeRotationSpeed(_selectedZoomRotationSpeed);
     }
     
-    private void CloseZoom()
+    private void GunCloseZoom()
     {
         if (_selectedGunZoomCanvasImage != null)
         {
