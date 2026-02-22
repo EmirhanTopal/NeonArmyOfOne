@@ -52,13 +52,31 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "EquipGun",
+                    "name": "EquipGunKeyboard",
                     "type": "Button",
                     "id": "21a72a21-9f7e-424f-b860-4eca7c45520e",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "Zoom",
+                    "type": "Button",
+                    "id": "42c1f297-7cd9-4f99-bfcb-ab47e0333e8c",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "EquipGunScroll",
+                    "type": "Value",
+                    "id": "7846c866-b46a-49d6-8b51-7d4a926a87f0",
+                    "expectedControlType": "Axis",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
                 }
             ],
             "bindings": [
@@ -267,7 +285,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "EquipGun",
+                    "action": "EquipGunKeyboard",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -278,7 +296,40 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "EquipGun",
+                    "action": "EquipGunKeyboard",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "35b8d14a-a5ea-4e4a-a6cf-28390d3bb7d8",
+                    "path": "<Keyboard>/#(3)",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "EquipGunKeyboard",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "9863876e-121a-4c96-8d2e-7cdb7b351902",
+                    "path": "<Mouse>/rightButton",
+                    "interactions": "Press(behavior=2)",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Zoom",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "774e693d-2ccc-4e1d-b7f9-87e4f3b1fb1e",
+                    "path": "<Mouse>/scroll/y",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "EquipGunScroll",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

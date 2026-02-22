@@ -14,9 +14,10 @@ namespace StarterAssets
 		public bool jump;
 		public bool sprint;
 		public bool shoot;
-		public bool firstSlot;
-		public bool secondSlot;
-		public Action<int> slotAction;
+		public bool zoom;
+		public float scrollValue;
+		public Action<int> slotActionByKeyboard;
+		public Action<float> slotActionByScroll;
 
 		[Header("Movement Settings")]
 		public bool analogMovement;
@@ -51,21 +52,32 @@ namespace StarterAssets
 
 		public void OnShoot(InputValue value)
 		{
-			bool isPressed = value.isPressed;
-			ShootInput(isPressed);
+			ShootInput(value.isPressed);
 		}
 
-		public void OnEquipGun(InputValue value)
+		public void OnEquipGunKeyboard(InputValue value)
 		{
 			if (value.isPressed)
 			{
 				// hangi tuş basıldı?
 				var control = Keyboard.current;
 				if (control.digit1Key.wasPressedThisFrame)
-					slotAction?.Invoke(1);
+					slotActionByKeyboard?.Invoke(1);
 				else if (control.digit2Key.wasPressedThisFrame)
-					slotAction?.Invoke(2);
+					slotActionByKeyboard?.Invoke(2);
+				else if (control.digit3Key.wasPressedThisFrame)
+					slotActionByKeyboard?.Invoke(3);
 			}
+		}
+
+		public void OnZoom(InputValue value)
+		{
+			ZoomInput(value.isPressed);
+		}
+
+		public void OnEquipGunScroll(InputValue value)
+		{
+			slotActionByScroll?.Invoke(value.Get<float>());
 		}
 #endif
 
@@ -93,6 +105,16 @@ namespace StarterAssets
 		public void ShootInput(bool newShootState)
 		{
 			shoot = newShootState;
+		}
+		
+		public void ZoomInput(bool newZoomState)
+		{
+			zoom = newZoomState;
+		}
+		
+		public void ScrollInput(float scroll)
+		{
+			scrollValue = scroll;
 		}
 		
 		private void OnApplicationFocus(bool hasFocus)
