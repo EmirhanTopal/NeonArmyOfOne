@@ -143,18 +143,16 @@ public class WeaponController : MonoBehaviour
 
     private void OnEnable()
     {
-        //GetAnimationState.onAnimationFinished += DelayFire;
         PickUpGun.AvailableWeaponAction += IsGunAvailable;
-        
+        PickupAmmo.OnPickupAmmoAction += IncreaseAmmoByPickup;
         _starterAssetsInputs.slotActionByKeyboard += SelectGunByKeyboard;
         _starterAssetsInputs.slotActionByScroll += SelectGunByScroll;
     }
 
     private void OnDisable()
     {
-        //GetAnimationState.onAnimationFinished -= DelayFire;
         PickUpGun.AvailableWeaponAction -= IsGunAvailable;
-        
+        PickupAmmo.OnPickupAmmoAction -= IncreaseAmmoByPickup;
         _starterAssetsInputs.slotActionByKeyboard -= SelectGunByKeyboard;
         _starterAssetsInputs.slotActionByScroll -= SelectGunByScroll;
     }
@@ -302,6 +300,42 @@ public class WeaponController : MonoBehaviour
         }
         SetAmmoReturnToGun();
         SelectGun(_weaponsSlot.Count - 1);
+    }
+
+    private void IncreaseAmmoByPickup(int ammoAmountParam)
+    {
+        while (ammoAmountParam > 0)
+        {
+            if ((CurrentAmmoStock == _selectedGunAmmoStock && CurrentAmmo == _selectedGunAmmo))
+                break;
+            int gapCurrSelect = _selectedGunAmmo - CurrentAmmo; // max slot miktarı - şu anki ammo
+            if (gapCurrSelect == 0)
+            {
+                if (CurrentAmmoStock + 1 <= _selectedGunAmmoStock)
+                {
+                    CurrentAmmoStock++;
+                    CurrentAmmo = 0;
+                    continue;
+                }
+                break;
+            }
+            if (ammoAmountParam - gapCurrSelect > 0)
+            {
+                if (CurrentAmmoStock + 1 <= _currentAmmoStock)
+                {
+                    CurrentAmmoStock++;
+                    CurrentAmmo = 0;
+                }
+                else
+                    CurrentAmmo += gapCurrSelect;
+                ammoAmountParam -= gapCurrSelect; // parametre ile gelen ammo - aradaki ammo fark
+            }
+            else
+            {
+                CurrentAmmo += ammoAmountParam;
+                break;
+            }
+        }
     }
 
     private void SelectGunByScroll(float scrollValue)
