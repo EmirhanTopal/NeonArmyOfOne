@@ -11,7 +11,7 @@ public class PickUpGun : Pickup
         transform.Rotate(0f, 100f * Time.deltaTime, 0f);
     }
 
-    protected override void PickupWeapon()
+    protected override void OnPickup()
     {
         AvailableWeaponAction?.Invoke(weapon);
         Destroy(this.gameObject);

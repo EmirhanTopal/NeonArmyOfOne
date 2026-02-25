@@ -12,6 +12,7 @@ public struct WeaponSlot
 {
     public GameObject weaponGo;
     public Weapon weaponType;
+    public bool isActive;
 }
 
 public enum Weapon 
@@ -28,8 +29,7 @@ public class WeaponController : MonoBehaviour
     private int _rayMaxDistance;
     private bool _delayControl = true;
     private List<WeaponSlot> _weaponsSlot = new List<WeaponSlot>();
-    private int _scrollSlotChangeValue = 0;
-    private int _currentSlotIndex = 2;
+    private int _currentSlotIndex = 0;
     
     [Header("Canvas Related Weapons")]
     [SerializeField] private GameObject defaultAimCanvasImage;
@@ -145,6 +145,7 @@ public class WeaponController : MonoBehaviour
     {
         //GetAnimationState.onAnimationFinished += DelayFire;
         PickUpGun.AvailableWeaponAction += IsGunAvailable;
+        
         _starterAssetsInputs.slotActionByKeyboard += SelectGunByKeyboard;
         _starterAssetsInputs.slotActionByScroll += SelectGunByScroll;
     }
@@ -153,6 +154,7 @@ public class WeaponController : MonoBehaviour
     {
         //GetAnimationState.onAnimationFinished -= DelayFire;
         PickUpGun.AvailableWeaponAction -= IsGunAvailable;
+        
         _starterAssetsInputs.slotActionByKeyboard -= SelectGunByKeyboard;
         _starterAssetsInputs.slotActionByScroll -= SelectGunByScroll;
     }
@@ -280,26 +282,26 @@ public class WeaponController : MonoBehaviour
         {
             case Weapon.Pistol:
                 _isPistolAvailable = true;
-                _weaponsSlot.Add(new WeaponSlot{ weaponGo = pistol , weaponType = weaponType});
+                _weaponsSlot.Add(new WeaponSlot{ weaponGo = pistol , weaponType = weaponType, isActive = false});
                 break;
             case Weapon.Smg:
                 _isSmgAvailable = true;
-                _weaponsSlot.Add(new WeaponSlot{ weaponGo = smg , weaponType = weaponType});
+                _weaponsSlot.Add(new WeaponSlot{ weaponGo = smg , weaponType = weaponType, isActive = false});
                 break;
             case Weapon.Awp:
                 _isAwpAvailable = true;
-                _weaponsSlot.Add(new WeaponSlot{ weaponGo = awp , weaponType = weaponType});
+                _weaponsSlot.Add(new WeaponSlot{ weaponGo = awp , weaponType = weaponType, isActive = false});
                 break;
         }
-        foreach (var weapon in _weaponsSlot)
+        for (int i = 0; i < _weaponsSlot.Count; i++)
         {
-            weapon.weaponGo.SetActive(false);
+            _weaponsSlot[i].weaponGo.SetActive(false);
+            WeaponSlot slotFor = _weaponsSlot[i];
+            slotFor.isActive = false;
+            _weaponsSlot[i] = slotFor;
         }
         SetAmmoReturnToGun();
-        _weaponsSlot[_weaponsSlot.Count - 1].weaponGo.SetActive(true);
-        _selectedWeapon = _weaponsSlot[_weaponsSlot.Count - 1].weaponType;
-        _scrollSlotChangeValue++;
-        SelectGun();
+        SelectGun(_weaponsSlot.Count - 1);
     }
 
     private void SelectGunByScroll(float scrollValue)
@@ -307,6 +309,14 @@ public class WeaponController : MonoBehaviour
         // scroll da sorun var - ileri geri yapıldığında bug lı çalışıyor kontrol edilecek.
         if (_weaponsSlot.Count < 1)
             return;
+        for (int i = 0; i < _weaponsSlot.Count; i++)
+        {
+            if (_weaponsSlot[i].isActive)
+            {
+                _currentSlotIndex = i;
+                break;
+            }
+        }
         int scrollNormalized = 0;
         
         if (scrollValue > 0)
@@ -314,43 +324,49 @@ public class WeaponController : MonoBehaviour
         else if (scrollValue < 0)
             scrollNormalized = -1;
         
-        if (_scrollSlotChangeValue + scrollNormalized >= _weaponsSlot.Count)
-            _scrollSlotChangeValue = _weaponsSlot.Count;
-        else if (_scrollSlotChangeValue + scrollNormalized <= 0)
-            _scrollSlotChangeValue = 1;
+        if (_currentSlotIndex + scrollNormalized == _weaponsSlot.Count)
+            _currentSlotIndex = 0;
+        else if (_currentSlotIndex + scrollNormalized == 0)
+            _currentSlotIndex = 0;
+        else if (_currentSlotIndex + scrollNormalized < 0)
+            _currentSlotIndex = _weaponsSlot.Count - 1;
         else
-            _scrollSlotChangeValue += scrollNormalized;
-
-        if (_scrollSlotChangeValue == _currentSlotIndex)
-            return;
+            _currentSlotIndex += scrollNormalized;
         
-        _currentSlotIndex = _scrollSlotChangeValue;
-        foreach (var weapon in _weaponsSlot)
+        for (int i = 0; i < _weaponsSlot.Count; i++)
         {
-            weapon.weaponGo.SetActive(false);
+            _weaponsSlot[i].weaponGo.SetActive(false);
+            WeaponSlot slotFor = _weaponsSlot[i];
+            slotFor.isActive = false;
+            _weaponsSlot[i] = slotFor;
         }
         SetAmmoReturnToGun();
-        _weaponsSlot[_scrollSlotChangeValue - 1].weaponGo.SetActive(true);
-        _selectedWeapon = _weaponsSlot[_scrollSlotChangeValue - 1].weaponType;
-        SelectGun();
+        SelectGun(_currentSlotIndex);
     }
     
     private void SelectGunByKeyboard(int slotNumber)
     {
         if (_weaponsSlot.Count < slotNumber)
             return;
-        foreach (var weapon in _weaponsSlot)
+        for (int i = 0; i < _weaponsSlot.Count; i++)
         {
-            weapon.weaponGo.SetActive(false);
+            _weaponsSlot[i].weaponGo.SetActive(false);
+            WeaponSlot slotFor = _weaponsSlot[i];
+            slotFor.isActive = false;
+            _weaponsSlot[i] = slotFor;
         }
         SetAmmoReturnToGun();
-        _weaponsSlot[slotNumber - 1].weaponGo.SetActive(true);
-        _selectedWeapon = _weaponsSlot[slotNumber - 1].weaponType;
-        SelectGun();
+        SelectGun(slotNumber - 1);
     }
 
-    private void SelectGun()
+    private void SelectGun(int slotPoint)
     {
+        _weaponsSlot[slotPoint].weaponGo.SetActive(true);
+        _selectedWeapon = _weaponsSlot[slotPoint].weaponType;
+        // struct value type kopya döndürür direkt olarak değerleri değiştirilemez.
+        WeaponSlot slot = _weaponsSlot[slotPoint];
+        slot.isActive = true;
+        _weaponsSlot[slotPoint] = slot;
         switch (_selectedWeapon)
         {
             case Weapon.Pistol:
@@ -443,7 +459,6 @@ public class WeaponController : MonoBehaviour
 
         CurrentAmmo = _selectedGunAmmo;
         CurrentAmmoStock = _selectedGunAmmoStock;
-        Debug.Log("Ammo: " + CurrentAmmo + " / " + CurrentAmmoStock);
     }
     
     private void GunOpenZoom()

@@ -7,9 +7,9 @@ public abstract class Pickup : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Player"))
         {
-            PickupWeapon();
+            OnPickup();
         }
     }
 
-    protected abstract void PickupWeapon();
+    protected abstract void OnPickup();
 }
