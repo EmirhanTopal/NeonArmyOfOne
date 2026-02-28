@@ -8,4 +8,5 @@ public abstract class Enemy : MonoBehaviour, IDamagable
     public abstract void TakeDamage(int damage);
 
     public abstract void Die();
+    
 }

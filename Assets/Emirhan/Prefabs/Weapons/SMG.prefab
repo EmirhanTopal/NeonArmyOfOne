@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5943992697240413592}
   - component: {fileID: 7108087209719739068}
   - component: {fileID: 1728257725940010364}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Rail_A_Right
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -100,7 +100,7 @@ GameObject:
   - component: {fileID: 5013952310374074843}
   - component: {fileID: 2800868573606567958}
   - component: {fileID: 2611576825784085572}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Optic_AQ
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -190,7 +190,7 @@ GameObject:
   - component: {fileID: 8675352146026228274}
   - component: {fileID: 5968175136646729278}
   - component: {fileID: 5856411522411349536}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: SMG_P_Trigger
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -279,7 +279,7 @@ GameObject:
   - component: {fileID: 4426269561996120053}
   - component: {fileID: 8143225522577642129}
   - component: {fileID: 53265008154837883}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: SMG_P_BarrelGuard
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -368,7 +368,7 @@ GameObject:
   - component: {fileID: 961989852071132114}
   - component: {fileID: 5051518726713152640}
   - component: {fileID: 5873950516106879830}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: SMG_P_Sight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -457,7 +457,7 @@ GameObject:
   - component: {fileID: 3963790047068443581}
   - component: {fileID: 2153105151273923246}
   - component: {fileID: 2281682326117982735}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: SMG_P_Receiver_Up
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -546,7 +546,7 @@ GameObject:
   - component: {fileID: 9011007817874073271}
   - component: {fileID: 1009381418077040775}
   - component: {fileID: 5944465932833143779}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Optic_AQ_Lens
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -634,7 +634,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5829521118211612942}
   - component: {fileID: 2581795587026444183}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: SMG
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -689,7 +689,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3449978749896631912}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -737,7 +737,7 @@ GameObject:
   - component: {fileID: 7873266796835744871}
   - component: {fileID: 3064752759358950857}
   - component: {fileID: 8069290099546218395}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: SMG_P_BarrelGuard_Rail
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -826,7 +826,7 @@ GameObject:
   - component: {fileID: 792930066866232880}
   - component: {fileID: 9070934476408277266}
   - component: {fileID: 3226606772720948789}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Muzzle_Brake_J
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -915,7 +915,7 @@ GameObject:
   - component: {fileID: 5543092082605563836}
   - component: {fileID: 8290129773847979057}
   - component: {fileID: 2087389700673902594}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: ForwardGrip_D_Sand
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1004,7 +1004,7 @@ GameObject:
   - component: {fileID: 6465161474727598327}
   - component: {fileID: 6553676206140358841}
   - component: {fileID: 4664116614038439897}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: SMG_P_Receiver_Down
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1093,7 +1093,7 @@ GameObject:
   - component: {fileID: 8477166147983809164}
   - component: {fileID: 4184637305886272396}
   - component: {fileID: 3587591239628430710}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: SMG_P_Mag
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1182,7 +1182,7 @@ GameObject:
   - component: {fileID: 2875999624160458717}
   - component: {fileID: 1786357467765361161}
   - component: {fileID: 8022232687410307912}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: WFX_MF FPS RIFLE1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6055,7 +6055,7 @@ GameObject:
   - component: {fileID: 2290684289643076316}
   - component: {fileID: 8426120450376008667}
   - component: {fileID: 4178236432251803324}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: SMG_P_Bolt
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6144,7 +6144,7 @@ GameObject:
   - component: {fileID: 4704286986952538171}
   - component: {fileID: 8120262304546176580}
   - component: {fileID: 564869943366156121}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: SMG_P_Stock
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6234,7 +6234,7 @@ GameObject:
   - component: {fileID: 4855396171545870330}
   - component: {fileID: 3582293600214760558}
   - component: {fileID: 9002711232680335841}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Light
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6374,7 +6374,7 @@ GameObject:
   - component: {fileID: 32477289830902674}
   - component: {fileID: 5192903168939234201}
   - component: {fileID: 6519213655565269345}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Sparks
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11262,7 +11262,7 @@ GameObject:
   - component: {fileID: 702156066303977828}
   - component: {fileID: 7263867825196222984}
   - component: {fileID: 6129196204771176629}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Glow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -16150,7 +16150,7 @@ GameObject:
   - component: {fileID: 329917535079396316}
   - component: {fileID: 4072115864023945239}
   - component: {fileID: 253073086702780830}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: SMG_P_Barrel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -16239,7 +16239,7 @@ GameObject:
   - component: {fileID: 1888268627603068184}
   - component: {fileID: 4035313681891965708}
   - component: {fileID: 6894522363013328439}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Light_F_Right
   m_TagString: Untagged
   m_Icon: {fileID: 0}

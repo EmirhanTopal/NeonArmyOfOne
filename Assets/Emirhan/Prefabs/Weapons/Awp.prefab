@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8904782052712631853}
   - component: {fileID: 8178752913707713793}
   - component: {fileID: 8454118632402185275}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Muzzle_Recon_Brake_D
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -100,7 +100,7 @@ GameObject:
   - component: {fileID: 8294620499062596985}
   - component: {fileID: 7011835595837385527}
   - component: {fileID: 7571855239846802703}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Recon_P_Sight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -189,7 +189,7 @@ GameObject:
   - component: {fileID: 8833335640430448149}
   - component: {fileID: 2501414265903948285}
   - component: {fileID: 6624132721243541459}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: WFX_MF FPS RIFLE1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5062,7 +5062,7 @@ GameObject:
   - component: {fileID: 7491274926418399984}
   - component: {fileID: 4066100062808482202}
   - component: {fileID: 2094476013482828182}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Recon_P_Trigger
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5151,7 +5151,7 @@ GameObject:
   - component: {fileID: 1365367759389944324}
   - component: {fileID: 5580265097894444623}
   - component: {fileID: 351839132002145281}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Sparks
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10039,7 +10039,7 @@ GameObject:
   - component: {fileID: 7530300659873668721}
   - component: {fileID: 6151059349325569376}
   - component: {fileID: 1441360898992550334}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Recon_P_Bolt
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10128,7 +10128,7 @@ GameObject:
   - component: {fileID: 8528686141331639828}
   - component: {fileID: 3686538846844417001}
   - component: {fileID: 4139456814576490782}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Glow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -15014,7 +15014,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6780780037166823140}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Model
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -15060,7 +15060,7 @@ GameObject:
   - component: {fileID: 4652537155617016008}
   - component: {fileID: 4694038151787764730}
   - component: {fileID: 9090307978693986421}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Recon_P_Bipod_Left
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -15149,7 +15149,7 @@ GameObject:
   - component: {fileID: 1482886644043062747}
   - component: {fileID: 7617411707556895834}
   - component: {fileID: 7987735193735651219}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Recon_P_Stock
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -15238,7 +15238,7 @@ GameObject:
   - component: {fileID: 7668863259815008706}
   - component: {fileID: 4225957624015106720}
   - component: {fileID: 2855063972123175926}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Optic_Recon_T
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -15328,7 +15328,7 @@ GameObject:
   - component: {fileID: 5546393911903643903}
   - component: {fileID: 460916500114008374}
   - component: {fileID: 7883513644679422119}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Recon_P_Receiver
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -15417,7 +15417,7 @@ GameObject:
   - component: {fileID: 3014581535293400679}
   - component: {fileID: 8402736551402337231}
   - component: {fileID: 3592243410534846555}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Recon_P_Barrel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -15506,7 +15506,7 @@ GameObject:
   - component: {fileID: 2362584838766908904}
   - component: {fileID: 8750672879609460424}
   - component: {fileID: 1896829918411862517}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Recon_P_Bipod_Right
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -15595,7 +15595,7 @@ GameObject:
   - component: {fileID: 1396477355531056128}
   - component: {fileID: 2268625864275359459}
   - component: {fileID: 3016030138040965217}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Optic_Recon_T_Lens
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -15683,7 +15683,7 @@ GameObject:
   m_Component:
   - component: {fileID: 607827724067124961}
   - component: {fileID: 836868954345594453}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Awp
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -15740,7 +15740,7 @@ GameObject:
   - component: {fileID: 2618381509901484649}
   - component: {fileID: 2271320867736648842}
   - component: {fileID: 180113891367165133}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Recon_P_Grip
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -15829,7 +15829,7 @@ GameObject:
   - component: {fileID: 6996462781907955406}
   - component: {fileID: 5095259036885463145}
   - component: {fileID: 467406744355814122}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Recon_P_Mag
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -15919,7 +15919,7 @@ GameObject:
   - component: {fileID: 8192302725409574438}
   - component: {fileID: 1316224639419687049}
   - component: {fileID: 847581924899056037}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Light
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -16059,7 +16059,7 @@ GameObject:
   - component: {fileID: 2239426447335041484}
   - component: {fileID: 8764606266430251936}
   - component: {fileID: 6720578358003913541}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Recon_P_Bipod
   m_TagString: Untagged
   m_Icon: {fileID: 0}

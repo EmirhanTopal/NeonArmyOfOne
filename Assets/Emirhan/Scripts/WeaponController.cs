@@ -30,6 +30,8 @@ public class WeaponController : MonoBehaviour
     private bool _delayControl = true;
     private List<WeaponSlot> _weaponsSlot = new List<WeaponSlot>();
     private int _currentSlotIndex = 0;
+    [SerializeField] private Camera weaponCamera;
+    private int _weaponCameraFowDefault = 40;
     
     [Header("Canvas Related Weapons")]
     [SerializeField] private GameObject defaultAimCanvasImage;
@@ -71,11 +73,12 @@ public class WeaponController : MonoBehaviour
     private int _currentAmmoStock = -1;
     public int CurrentAmmo { get => _currentAmmo; set { if (value < 0) _currentAmmo = 0; else _currentAmmo = value; }}
     public int CurrentAmmoStock { get => _currentAmmoStock; set { if (value < 0) _currentAmmoStock = 0; else _currentAmmoStock = value; } }
-    //private int CurrentAmmo { get { return _currentAmmo; } set { if (value < 0) _currentAmmo = 0; } }
-    //private int CurrentAmmoStock { get { return _currentAmmoStock; } set { if (value < 0) _currentAmmoStock = 0; } }
     private bool _pistolInitialized;
     private bool _smgInitialized;
     private bool _awpInitialized;
+    private CinemachineCollisionImpulseSource _cinemachineCollisionImpulseSource;
+    private CinemachineImpulseDefinition.ImpulseShapes  _selectedImpulseShapes;
+    private Vector3 _selectedInvocation;
 
     [Header("Pistol")]
     [SerializeField] private GameObject pistol;
@@ -90,8 +93,10 @@ public class WeaponController : MonoBehaviour
     [SerializeField] private float pistolZoomRotationSpeed;
     [SerializeField] private int pistolAmmo;
     [SerializeField] private int pistolAmmoStock;
-    private int pistolCurrentAmmo;
-    private int pistolCurrentAmmoStock;
+    private int _pistolCurrentAmmo;
+    private int _pistolCurrentAmmoStock;
+    [SerializeField] private CinemachineImpulseDefinition.ImpulseShapes  pistolImpulseShapes;
+    [SerializeField] private Vector3 pistolInvocation;
     
     [Header("SMG")]
     [SerializeField] private GameObject smg;
@@ -106,8 +111,10 @@ public class WeaponController : MonoBehaviour
     [SerializeField] private float smgRotationSpeed;
     [SerializeField] private int smgAmmo;
     [SerializeField] private int smgAmmoStock;
-    private int smgCurrentAmmo;
-    private int smgCurrentAmmoStock;
+    private int _smgCurrentAmmo;
+    private int _smgCurrentAmmoStock;
+    [SerializeField] private CinemachineImpulseDefinition.ImpulseShapes  smgImpulseShapes;
+    [SerializeField] private Vector3 smgInvocation;
     
     [Header("Awp")]
     [SerializeField] private GameObject awp;
@@ -123,13 +130,16 @@ public class WeaponController : MonoBehaviour
     [SerializeField] private float awpZoomRotationSpeed;
     [SerializeField] private int awpAmmo;
     [SerializeField] private int awpAmmoStock;
-    private int awpCurrentAmmo;
-    private int awpCurrentAmmoStock;
+    private int _awpCurrentAmmo;
+    private int _awpCurrentAmmoStock;
+    [SerializeField] private CinemachineImpulseDefinition.ImpulseShapes  awpImpulseShapes;
+    [SerializeField] private Vector3 awpInvocation;
     
     private void Awake()
     {
         _starterAssetsInputs = GetComponentInParent<StarterAssetsInputs>();
         _firstPersonController = GetComponentInParent<FirstPersonController>();
+        _cinemachineCollisionImpulseSource = GetComponent<CinemachineCollisionImpulseSource>();
         _mainCamera = Camera.main;
         _selectedWeapon = Weapon.Empty;
         _weaponsSlot.Clear();
@@ -205,6 +215,9 @@ public class WeaponController : MonoBehaviour
         StartCoroutine(DelayFireByRate());
         _selectedShootParticle.Play();
         _selectedAnimator.Play(_selectedWeaponFireAnimName,0, 0);
+        _cinemachineCollisionImpulseSource.m_DefaultVelocity = _selectedInvocation;
+        _cinemachineCollisionImpulseSource.m_ImpulseDefinition.m_ImpulseShape = _selectedImpulseShapes;
+        _cinemachineCollisionImpulseSource.GenerateImpulse();
         RaycastHit hit;
         if (Physics.Raycast(_mainCamera.transform.position, _mainCamera.transform.forward, out hit,Mathf.Infinity, raycastLayerMask, QueryTriggerInteraction.Ignore)) // ctrl + shift + space constructor ları görüntüler
         {
@@ -230,20 +243,20 @@ public class WeaponController : MonoBehaviour
 
     private bool AmmoControl()
     {
-        if (CurrentAmmoStock > 0)
+        if (CurrentAmmoStock == 0 && CurrentAmmo == 0)
+            return false;
+        if (CurrentAmmoStock >= 0)
         {
             if (CurrentAmmo > 0)
             {
                 CurrentAmmo--;
             }
-            if (CurrentAmmo == 0)
+            if (CurrentAmmo == 0 && CurrentAmmoStock > 0)
             {
                 CurrentAmmoStock--;
                 CurrentAmmo = _selectedGunAmmo;
             }
         }
-        if (CurrentAmmoStock == 0 && CurrentAmmo == 0)
-            return false;
         return true;
     }
 
@@ -252,16 +265,16 @@ public class WeaponController : MonoBehaviour
         switch (_selectedWeapon)
         {
             case Weapon.Pistol:
-                pistolCurrentAmmo = CurrentAmmo;
-                pistolCurrentAmmoStock = CurrentAmmoStock;
+                _pistolCurrentAmmo = CurrentAmmo;
+                _pistolCurrentAmmoStock = CurrentAmmoStock;
                 break;
             case Weapon.Smg:
-                smgCurrentAmmo = CurrentAmmo;
-                smgCurrentAmmoStock = CurrentAmmoStock;
+                _smgCurrentAmmo = CurrentAmmo;
+                _smgCurrentAmmoStock = CurrentAmmoStock;
                 break;
             case Weapon.Awp:
-                awpCurrentAmmo = CurrentAmmo;
-                awpCurrentAmmoStock = CurrentAmmoStock;
+                _awpCurrentAmmo = CurrentAmmo;
+                _awpCurrentAmmoStock = CurrentAmmoStock;
                 break;
         }
     }
@@ -414,23 +427,24 @@ public class WeaponController : MonoBehaviour
                 _selectedGunCanZoom = pistolCanZoom;
                 _selectedZoomField = pistolZoomField;
                 _selectedGunZoomCanvasImage = null;
-
                 pistolZoomRotationSpeed = _defaultRotationSpeed;
                 _selectedZoomRotationSpeed = pistolZoomRotationSpeed;
-
                 if (!_pistolInitialized)
                 {
                     _selectedGunAmmo = pistolAmmo;
                     _selectedGunAmmoStock = pistolAmmoStock;
-                    pistolCurrentAmmo = pistolAmmo;
-                    pistolCurrentAmmoStock = pistolAmmoStock;
+                    _pistolCurrentAmmo = pistolAmmo;
+                    _pistolCurrentAmmoStock = pistolAmmoStock;
                     _pistolInitialized = true;
                 }
                 else
                 {
-                    _selectedGunAmmo = pistolCurrentAmmo;
-                    _selectedGunAmmoStock = pistolCurrentAmmoStock;
+                    _selectedGunAmmo = _pistolCurrentAmmo;
+                    _selectedGunAmmoStock = _pistolCurrentAmmoStock;
                 }
+
+                _selectedImpulseShapes = pistolImpulseShapes;
+                _selectedInvocation = pistolInvocation;
                 break;
             
             case Weapon.Smg:
@@ -443,23 +457,23 @@ public class WeaponController : MonoBehaviour
                 _selectedGunDamage = smgDamage;
                 _selectedGunCanZoom = smgCanZoom;
                 _selectedZoomField = smgZoomField;
-                
                 pistolZoomRotationSpeed = _defaultRotationSpeed;
                 _selectedGunZoomCanvasImage = null;
-                
                 if (!_smgInitialized)
                 {
                     _selectedGunAmmo = smgAmmo;
                     _selectedGunAmmoStock = smgAmmoStock;
-                    smgCurrentAmmo = smgAmmo;
-                    smgCurrentAmmoStock = smgAmmoStock;
+                    _smgCurrentAmmo = smgAmmo;
+                    _smgCurrentAmmoStock = smgAmmoStock;
                     _smgInitialized = true;
                 }
                 else
                 {
-                    _selectedGunAmmo = smgCurrentAmmo;
-                    _selectedGunAmmoStock = smgCurrentAmmoStock;
+                    _selectedGunAmmo = _smgCurrentAmmo;
+                    _selectedGunAmmoStock = _smgCurrentAmmoStock;
                 }
+                _selectedImpulseShapes = smgImpulseShapes;
+                _selectedInvocation = smgInvocation;
                 break;
             
             case Weapon.Awp:
@@ -474,20 +488,21 @@ public class WeaponController : MonoBehaviour
                 _selectedZoomField = awpZoomField;
                 _selectedGunZoomCanvasImage = awpZoomCanvasImage;
                 _selectedZoomRotationSpeed = awpZoomRotationSpeed;
-                
                 if (!_awpInitialized)
                 {
                     _selectedGunAmmo = awpAmmo;
                     _selectedGunAmmoStock = awpAmmoStock;
-                    awpCurrentAmmo = awpAmmo;
-                    awpCurrentAmmoStock = awpAmmoStock;
+                    _awpCurrentAmmo = awpAmmo;
+                    _awpCurrentAmmoStock = awpAmmoStock;
                     _awpInitialized = true;
                 }
                 else
                 {
-                    _selectedGunAmmo = awpCurrentAmmo;
-                    _selectedGunAmmoStock = awpCurrentAmmoStock;
+                    _selectedGunAmmo = _awpCurrentAmmo;
+                    _selectedGunAmmoStock = _awpCurrentAmmoStock;
                 }
+                _selectedImpulseShapes = awpImpulseShapes;
+                _selectedInvocation = awpInvocation;
                 break;
         }
 
@@ -497,22 +512,22 @@ public class WeaponController : MonoBehaviour
     
     private void GunOpenZoom()
     {
-        if (_selectedGunZoomCanvasImage != null)
-        {
-            _selectedGunZoomCanvasImage.SetActive(true);
-            defaultAimCanvasImage.SetActive(false);
-        }
+        if (_selectedGunZoomCanvasImage == null)
+            return;
+        weaponCamera.fieldOfView = 10;
+        _selectedGunZoomCanvasImage.SetActive(true);
+        defaultAimCanvasImage.SetActive(false);
         playerFollowCamera.m_Lens.FieldOfView = _selectedZoomField;
         _firstPersonController.ChangeRotationSpeed(_selectedZoomRotationSpeed);
     }
     
     private void GunCloseZoom()
     {
-        if (_selectedGunZoomCanvasImage != null)
-        {
-            _selectedGunZoomCanvasImage.SetActive(false);
-            defaultAimCanvasImage.SetActive(true);
-        }
+        if (_selectedGunZoomCanvasImage == null)
+            return;
+        weaponCamera.fieldOfView = _weaponCameraFowDefault;
+        _selectedGunZoomCanvasImage.SetActive(false);
+        defaultAimCanvasImage.SetActive(true);
         _firstPersonController.ChangeRotationSpeed(_defaultRotationSpeed);
         playerFollowCamera.m_Lens.FieldOfView = _mainCameraDefaultZoomField;
     }
